@@ -1,61 +1,71 @@
-import { useContext } from "react";
+import React, { memo } from "react";
 import Image from "next/image";
-import { Box, Icon, Flex } from "@chakra-ui/react";
-import { ScrollMenu, VisibilityContext } from "react-horizontal-scrolling-menu";
+import { Carousel } from "react-responsive-carousel";
+import "react-responsive-carousel/lib/styles/carousel.min.css";
 import { FaArrowAltCircleLeft, FaArrowAltCircleRight } from "react-icons/fa";
+import { Icon } from "@chakra-ui/react";
 
-const LeftArrow = () => {
-  const { scrollPrev } = useContext(VisibilityContext);
-
-  return (
-    <Flex justifyContent="center" alignItems="center" marginRight="1">
-      <Icon
-        as={FaArrowAltCircleLeft}
-        onClick={scrollPrev}
-        fontSize="2xl"
-        cursor="pointer"
-        display={["none", "none", "none", "block"]} // Use display instead of d
-      />
-    </Flex>
-  );
-};
-
-const RightArrow = () => {
-  const { scrollNext } = useContext(VisibilityContext);
+const ImageCarousel = ({ data, onChange }) => {
+  if (!data || !Array.isArray(data) || data.length === 0) {
+    return <div>No Property available</div>;
+  }
 
   return (
-    <Flex justifyContent="center" alignItems="center" marginLeft="1">
-      <Icon
-        as={FaArrowAltCircleRight}
-        onClick={scrollNext}
-        fontSize="2xl"
-        cursor="pointer"
-        display={["none", "none", "none", "block"]} // Use display instead of d
-      />
-    </Flex>
-  );
-};
-
-export default function ImageScrollbar({ data }) {
-  return (
-    <ScrollMenu
-      LeftArrow={LeftArrow}
-      RightArrow={RightArrow}
-      style={{ overflowX: "hidden" }}
-    >
-      {data.map((item) => (
-        <Box key={item.url} itemId={item.id} overflow="hidden" p="1">
-          <Image
-            alt="property"
-            placeholder="blur"
-            blurDataURL={item.url}
-            src={item.url}
-            width={1000}
-            height={500}
-            sizes="(max-width: 500px) 100px, (max-width: 1023px) 400px, 1000px"
+    <div>
+      <Carousel
+        showArrows
+        showThumbs={false}
+        showStatus={false}
+        showIndicators={false}
+        onChange={(index) => onChange(index)}
+        renderArrowPrev={(clickHandler, hasPrev) => (
+          <Icon
+            as={FaArrowAltCircleLeft}
+            onClick={clickHandler}
+            fontSize="3xl"
+            cursor="pointer"
+            position="absolute"
+            top="50%"
+            left="25px"
+            zIndex={2}
+            display={hasPrev ? "block" : "none"}
           />
-        </Box>
-      ))}
-    </ScrollMenu>
+        )}
+        renderArrowNext={(clickHandler, hasNext) => (
+          <Icon
+            as={FaArrowAltCircleRight}
+            onClick={clickHandler}
+            fontSize="3xl"
+            cursor="pointer"
+            position="absolute"
+            top="50%"
+            right="25px"
+            zIndex={2}
+            display={hasNext ? "block" : "none"}
+          />
+        )}
+        infiniteLoop
+        autoPlay
+        interval={5000}
+        transitionTime={700}
+      >
+        {data.map((item, index) => (
+          <div key={index}>
+            <Image
+              src={item.url}
+              alt={`slide ${index + 1}`}
+              width={1000}
+              height={500}
+              quality={70}
+              placeholder="blur"
+              blurDataURL={item.url + "?w=10&h=10&q=10"}
+              sizes="(max-width: 500px) 100px, (max-width: 1023px) 400px, 1000px"
+            />
+          </div>
+        ))}
+      </Carousel>
+    </div>
   );
-}
+};
+
+export default memo(ImageCarousel);
