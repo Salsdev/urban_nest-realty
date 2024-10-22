@@ -4,9 +4,8 @@ const Footer = () => (
   <Box
     textAlign="center"
     p="5"
-    color="gray.600"
-    borderTop="1px"
-    borderColor="gray.100"
+    color="whiteAlpha.800"
+    bgGradient="linear(to-br, gray.900, gray.800)"
   >
     2024 Urban_Nest, Inc.
   </Box>

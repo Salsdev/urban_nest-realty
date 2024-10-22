@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useRouter } from "next/router";
 import Image from "next/image";
-import { Flex, Box, Text, Icon, Spinner } from "@chakra-ui/react";
+import { Flex, Box, Text, Icon, Spinner, Grid } from "@chakra-ui/react";
 import { BsFilter } from "react-icons/bs";
 import dynamic from "next/dynamic";
 import Property from "../components/Property";
@@ -23,14 +23,14 @@ const Search = ({ initialProperties, totalCount }) => {
   const observer = useRef();
   const debounceRef = useRef(null);
 
-  // Function to load more properties as the user scrolls
+  
   const loadMoreProperties = useCallback(async () => {
     if (loading || !hasMore) return;
 
     setLoading(true);
     const nextPage = page + 1;
 
-    // Fetch next set of properties
+  
     const data = await fetchApi(
       `${baseUrl}/properties/list?locationExternalIDs=5002&purpose=${
         router.query.purpose || "for-rent"
@@ -50,7 +50,7 @@ const Search = ({ initialProperties, totalCount }) => {
     setLoading(false);
   }, [page, loading, hasMore, properties.length, router.query.purpose]);
 
-  // Observer to load more properties when the last one is in view
+  
   const lastPropertyElementRef = useCallback(
     (node) => {
       if (loading) return;
@@ -67,7 +67,7 @@ const Search = ({ initialProperties, totalCount }) => {
     [loading, hasMore, loadMoreProperties]
   );
 
-  // Re-fetch properties if the search filters (query) change with debounce for performance
+  
   useEffect(() => {
     const fetchFilteredProperties = async () => {
       if (debounceRef.current) clearTimeout(debounceRef.current);
@@ -83,38 +83,46 @@ const Search = ({ initialProperties, totalCount }) => {
         setPage(1);
         setHasMore(true);
         setLoading(false);
-      }, 300); // Debounce for 300ms
+      }, 300);
     };
 
     fetchFilteredProperties();
-  }, [router.query.purpose]); // Re-run when purpose changes
+  }, [router.query.purpose]); 
 
   return (
     <Box>
+      
       <Flex
         cursor="pointer"
-        bg="gray.100"
+        bgGradient="linear(to-br, gray.900, gray.800)"
         borderBottom="1px"
-        borderColor="gray.200"
-        p="2"
-        fontWeight="black"
+        borderColor="gray.700"
+        p="4"
+        fontWeight="bold"
         fontSize="lg"
         justifyContent="center"
         alignItems="center"
         onClick={() => setSearchFilters((prevFilters) => !prevFilters)}
       >
-        <Text>Search Property By Filter</Text>
-        <Icon paddingleft="2" w="7" as={BsFilter} />
+        <Text color="whiteAlpha.900">Search Property By Filter</Text>
+        <Icon pl="2" w="7" as={BsFilter} color="teal.400" />
       </Flex>
 
+      
       {searchFilters && <SearchFilters />}
 
-      <Text fontSize="2xl" p="4" fontWeight="bold">
-        Properties{" "}
-        {router.query.purpose === "for-sale" ? "for Sale" : "for Rent"}
+      
+      <Text fontSize="3xl" fontWeight="bold" p="4" color="whiteAlpha.900" textAlign="center">
+        Properties {router.query.purpose === "for-sale" ? "for Sale" : "for Rent"}
       </Text>
 
-      <Flex flexWrap="wrap">
+      
+      <Grid
+        templateColumns={{ base: "1fr", md: "repeat(2, 1fr)", lg: "repeat(3, 1fr)" }}
+        gap={6} 
+        padding={4}
+        width="100%"
+      >
         {properties.map((property, index) => {
           if (properties.length === index + 1) {
             return (
@@ -126,24 +134,26 @@ const Search = ({ initialProperties, totalCount }) => {
             return <Property property={property} key={property.id} />;
           }
         })}
-      </Flex>
+      </Grid>
 
+      
       {loading && (
         <Flex justifyContent="center" mt="4">
-          <Spinner size="lg" />
+          <Spinner size="lg" color="teal.400" />
         </Flex>
       )}
 
+      
       {properties.length === 0 && !loading && (
         <Flex
           justifyContent="center"
           alignItems="center"
           flexDir="column"
-          marginTop="5"
-          marginBottom="5"
+          mt="5"
+          mb="5"
         >
           <Image alt="no result" src={noresult} />
-          <Text fontSize="2xl" marginTop="3">
+          <Text fontSize="2xl" mt="3" color="whiteAlpha.900">
             No Results Found.
           </Text>
         </Flex>
@@ -165,10 +175,10 @@ export async function getServerSideProps({ query }) {
   const areaMax = query.areaMax || "35000";
   const locationExternalIDs = query.locationExternalIDs || "5002";
   const categoryExternalID = query.categoryExternalID || "4";
-  const hitsPerPage = 10; // Fetch 10 properties per page
-  const page = 1; // Start from page 1
+  const hitsPerPage = 10; 
+  const page = 1; 
 
-  // Fetch the initial set of properties
+  
   const data = await fetchApi(
     `${baseUrl}/properties/list?locationExternalIDs=${locationExternalIDs}&purpose=${purpose}&categoryExternalID=${categoryExternalID}&bathsMin=${bathsMin}&rentFrequency=${rentFrequency}&priceMin=${minPrice}&priceMax=${maxPrice}&roomsMin=${roomsMin}&sort=${sort}&areaMax=${areaMax}&hitsPerPage=${hitsPerPage}&page=${page}&fields=title,price,coverPhoto,rentFrequency`
   );
@@ -176,7 +186,7 @@ export async function getServerSideProps({ query }) {
   return {
     props: {
       initialProperties: data?.hits || [],
-      totalCount: data?.totalCount || 0, // Track total count for further loading
+      totalCount: data?.totalCount || 0, 
     },
   };
 }
