@@ -31,7 +31,7 @@ This project was developed as a portfolio project for Alx School.
 ---
 ## Installation
 
-To get started with Blog-Hub, follow these steps:
+To get started with Urban_Nest, follow these steps:
 1. Clone the repository:
 
    ```sh
